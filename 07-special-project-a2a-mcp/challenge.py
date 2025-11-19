@@ -1,0 +1,56 @@
+import sqlite3
+from typing import Literal
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.tools import tool
+from langgraph.graph import StateGraph, MessagesState, START, END
+from langgraph.prebuilt import ToolNode
+
+# Setup DB
+def setup_db():
+    conn = sqlite3.connect("special_db.sqlite")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY, message TEXT)")
+    cursor.execute("INSERT OR IGNORE INTO logs (id, message) VALUES (1, 'System started')")
+    cursor.execute("INSERT OR IGNORE INTO logs (id, message) VALUES (2, 'Error: Disk full')")
+    conn.commit()
+    conn.close()
+
+setup_db()
+
+@tool
+def read_logs():
+    """[Reader Tool] Read the logs table."""
+    conn = sqlite3.connect("special_db.sqlite")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM logs")
+    logs = cursor.fetchall()
+    conn.close()
+    return str(logs)
+
+@tool
+def write_alert(message: str):
+    """[Writer Tool] Write an alert to a file."""
+    print(f"!!! WRITING ALERT: {message} !!!")
+    return "Alert written."
+
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+
+# TODO: Define two agents
+# 1. Reader: Uses 'read_logs' to find errors.
+# 2. Writer: Uses 'write_alert' to save the error.
+
+# reader_tools = [read_logs]
+# writer_tools = [write_alert]
+
+# TODO: Define nodes and routing
+# If Reader finds "Error", handoff to Writer.
+
+builder = StateGraph(MessagesState)
+# builder.add_node(...)
+
+graph = builder.compile()
+
+if __name__ == "__main__":
+    print("User: Check logs for errors and alert if found.")
+    # result = graph.invoke(...)
+    # print(result)

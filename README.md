@@ -163,8 +163,32 @@ graph TD
 
 ---
 
-### 7. Multi-Agent Orchestration: Dev Team
-**Folder:** `07-multi-agent-orchestration`
+### 7. Special Project: A2A + MCP
+**Folder:** `07-special-project-a2a-mcp`
+
+Combine **Agent-to-Agent** communication with **MCP** tools.
+- **Scout**: Finds the table.
+- **Analyst**: Queries the table.
+
+```mermaid
+graph LR
+    START((Start)) --> Scout
+    Scout -->|Handoff| Analyst
+    Analyst --> END((End))
+    
+    subgraph "Distributed Tools"
+    Scout -.-> ListTables
+    Analyst -.-> RunQuery
+    end
+```
+
+*   **Goal**: A pipeline where one agent passes critical info to another to solve a task.
+*   **Run**: `uv run 07-special-project-a2a-mcp/project.py`
+
+---
+
+### 8. Multi-Agent Orchestration: Dev Team
+**Folder:** `08-multi-agent-orchestration`
 
 Scale up! Coordinate multiple specialized agents using the **Supervisor Pattern**.
 
@@ -183,8 +207,8 @@ graph TD
 
 ---
 
-### 8. Capstone: Autonomous Researcher
-**Folder:** `08-capstone-project`
+### 9. Capstone: Autonomous Researcher
+**Folder:** `09-capstone-project`
 
 The Final Boss. Combine everything you've learned into a single, powerful application.
 
