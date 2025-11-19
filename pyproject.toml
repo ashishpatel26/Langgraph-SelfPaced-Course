@@ -1,0 +1,18 @@
+[project]
+name = "langgraph-self-paced-learning"
+version = "0.1.0"
+description = "A self-paced learning repository for LangGraph 1.0"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "langgraph",
+    "langchain",
+    "langchain-openai",
+    "langchain-google-genai",
+    "langchain-community",
+    "python-dotenv",
+    "jupyter",
+]
+
+[dependency-groups]
+dev = []

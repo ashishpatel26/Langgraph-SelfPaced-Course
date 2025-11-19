@@ -1,5 +1,5 @@
 from typing import Literal
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.tools import tool
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -16,7 +16,7 @@ def search_flights(destination: str):
 tools = [search_flights]
 
 # 2. Define Agent
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
 llm_with_tools = llm.bind_tools(tools)
 
 def agent_node(state: MessagesState):

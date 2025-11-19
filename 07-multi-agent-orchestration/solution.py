@@ -1,12 +1,12 @@
 from typing import Literal, TypedDict
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langchain_core.messages import SystemMessage
 
 class TeamState(MessagesState):
     pass
 
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
 
 def coder_node(state: TeamState):
     print("--- Coder Working ---")
