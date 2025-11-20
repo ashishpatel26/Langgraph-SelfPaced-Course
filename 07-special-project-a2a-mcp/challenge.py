@@ -1,5 +1,10 @@
+import os
 import sqlite3
 from typing import Literal
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.tools import tool
 from langgraph.graph import StateGraph, MessagesState, START, END
@@ -33,7 +38,11 @@ def write_alert(message: str):
     print(f"!!! WRITING ALERT: {message} !!!")
     return "Alert written."
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise ValueError("GOOGLE_API_KEY not found")
+
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key.strip())
 
 # TODO: Define two agents
 # 1. Reader: Uses 'read_logs' to find errors.

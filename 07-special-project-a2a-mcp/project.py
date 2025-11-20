@@ -1,11 +1,15 @@
+import os
 import sqlite3
-from typing import Literal, TypedDict, Annotated
+from typing import Literal
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.tools import tool
-from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph import StateGraph, MessagesState, START, END
-from langgraph.prebuilt import ToolNode, tools_condition
-from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
 
 # Setup DB
 def setup_db():
@@ -47,8 +51,18 @@ def run_query(query: str):
 
 # --- AGENTS ---
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+# Initialize LLM with explicit API key
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise ValueError("GOOGLE_API_KEY not found in environment variables")
 
+llm = ChatGoogleGenerativeAI(
+    model="models/gemini-3-pro-preview",
+    thinking_budget=1024,
+    include_thoughts=True,
+    google_api_key=api_key.strip()
+)
+    
 # Scout: Only has list_tables
 scout_tools = [list_tables]
 scout_llm = llm.bind_tools(scout_tools)
@@ -76,7 +90,7 @@ def route_scout(state: MessagesState) -> Literal["scout_tools", "analyst", END]:
         return "scout_tools"
     
     # If Scout found the table, handoff to Analyst
-    if "products" in last_msg.content:
+    if "products" in last_msg.content.lower():
         print("--- Handoff: Scout -> Analyst ---")
         return "analyst"
         
@@ -111,7 +125,6 @@ graph = builder.compile()
 
 if __name__ == "__main__":
     print("User: Find the products table and tell me the price of SuperWidget.")
-    # We give a hint to start
     result = graph.invoke({"messages": [("user", "Find the products table and tell me the price of SuperWidget.")]})
     print("\nFinal Answer:")
     print(result["messages"][-1].content)
